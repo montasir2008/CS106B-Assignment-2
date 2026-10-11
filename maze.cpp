@@ -21,22 +21,53 @@ using namespace std;
 // behavior of the function and how you implemented this behavior
 Set<GridLocation> generateValidMoves(Grid<bool>& maze, GridLocation cur) {
     Set<GridLocation> neighbors;
-    /* TODO: Fill in the remainder of this function. */
+    Vector<GridLocation> candidates = {
+        {cur.row - 1, cur.col},  // Up
+        {cur.row + 1, cur.col},  // Down
+        {cur.row, cur.col - 1},  // Left
+        {cur.row, cur.col + 1}   // Right
+    };
+
+    for (GridLocation next : candidates) {
+        if (maze.inBounds(next) && maze[next]) {
+            neighbors.add(next);
+        }
+    }
+
     return neighbors;
 }
 
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
 void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
+    GridLocation exit = { maze.numRows()-1, maze.numCols()-1 }; // last row, last col
+    GridLocation origin = {0,0};
+    Set<GridLocation> dupeCheck;
     if (path.isEmpty()) {
         error("Path is empty!");
     }
-    /* TODO: Fill in the remainder of this function. */
+    if (path[0] != origin) {
+        error("Path does not start at the origin!");
+    }
+    if (path[path.size()-1] != exit) {
+        error("Path does end at the proper location!");
+    }
 
     /* If you find a problem with the path, call error() to report it.
      * If the path is a valid solution, then this function should run to completion
      * without raising any errors.
      */
+
+    for (int i = 1; i < path.size(); i++) {
+        if (dupeCheck.contains(path[i])) {
+            error("Path contains a repeated location!");
+        }
+        dupeCheck.add(path[i]);
+        Set<GridLocation> validCheck = generateValidMoves(maze, path[i-1]);
+        if (!validCheck.contains(path[i])) {
+            error("Wrong location detected in path!");
+        }
+    }
 }
 
 // TODO: Add a function header comment here to explain the
