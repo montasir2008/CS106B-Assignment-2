@@ -43,6 +43,7 @@ void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
     GridLocation exit = { maze.numRows()-1, maze.numCols()-1 }; // last row, last col
     GridLocation origin = {0,0};
     Set<GridLocation> dupeCheck;
+    dupeCheck.add(origin);
     if (path.isEmpty()) {
         error("Path is empty!");
     }
@@ -73,22 +74,60 @@ void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
 Vector<GridLocation> solveMazeBFS(Grid<bool>& maze) {
-    Vector<GridLocation> path;
+    Vector<GridLocation> path = {{0, 0}};
     Queue<Vector<GridLocation>> allPaths;
+    allPaths.enqueue(path);
+    GridLocation exit = { maze.numRows()-1, maze.numCols()-1 };
+    Set<GridLocation> dupeCheck = {{0, 0}};
 
     drawMaze(maze);
-    /* TODO: Fill in the remainder of this function. */
+    while(!allPaths.isEmpty()) {
+        path = allPaths.dequeue();
+        highlightPath(path, "blue",10);
+        if (path[path.size()-1] == exit) {
+            break;
+        }
+        Set<GridLocation> neighbors = generateValidMoves(maze,path[path.size()-1]);
+        for (GridLocation test : neighbors) {
+            if (!dupeCheck.contains(test)) {
+                dupeCheck.add(test);
+                Vector<GridLocation> pathCopy = path;
+                pathCopy.add(test);
+                allPaths.enqueue(pathCopy);
+            }
+        }
+    }
+
     return path;
 }
 
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
 Vector<GridLocation> solveMazeDFS(Grid<bool>& maze) {
-    Vector<GridLocation> path;
+    Vector<GridLocation> path = {{0, 0}};
     Stack<Vector<GridLocation>> allPaths;
+    allPaths.push(path);
+    GridLocation exit = { maze.numRows()-1, maze.numCols()-1 };
+    Set<GridLocation> dupeCheck = {{0, 0}};
 
     drawMaze(maze);
-    /* TODO: Fill in the remainder of this function. */
+    while(!allPaths.isEmpty()) {
+        path = allPaths.pop();
+        highlightPath(path, "blue",10);
+        if (path[path.size()-1] == exit) {
+            break;
+        }
+        Set<GridLocation> neighbors = generateValidMoves(maze,path[path.size()-1]);
+        for (GridLocation test : neighbors) {
+            if (!dupeCheck.contains(test)) {
+                dupeCheck.add(test);
+                Vector<GridLocation> pathCopy = path;
+                pathCopy.add(test);
+                allPaths.push(pathCopy);
+            }
+        }
+    }
+
     return path;
 }
 
@@ -229,4 +268,88 @@ PROVIDED_TEST("solveMazeDFS on file 21x23") {
     EXPECT_NO_ERROR(validatePath(maze, soln));
 }
 
-// TODO: add your test cases here
+// STUDENT_TEST()
+STUDENT_TEST("generateValidMoves excludes walls and diagonal passages") {
+    Grid<bool> maze = {{true,  false, true},
+                       {false, true,  false},
+                       {true,  false, true}};
+    GridLocation cur = {1, 1};
+    Set<GridLocation> expected;
+
+    EXPECT_EQUAL(generateValidMoves(maze, cur), expected);
+}
+
+STUDENT_TEST("generateValidMoves at bottom-right corner of rectangular grid") {
+    Grid<bool> maze = {{true, true, true},
+                       {true, true, true}};
+    GridLocation cur = {1, 2};
+    Set<GridLocation> expected = {{0, 2}, {1, 1}};
+
+    EXPECT_EQUAL(generateValidMoves(maze, cur), expected);
+}
+
+STUDENT_TEST("generateValidMoves in a 1x1 maze returns no neighbors") {
+    Grid<bool> maze = {{true}};
+    GridLocation cur = {0, 0};
+    Set<GridLocation> expected;
+
+    EXPECT_EQUAL(generateValidMoves(maze, cur), expected);
+}
+
+STUDENT_TEST("validatePath rejects an empty path") {
+    Grid<bool> maze = {{true, true},
+                       {true, true}};
+    Vector<GridLocation> path;
+
+    EXPECT_ERROR(validatePath(maze, path));
+}
+
+STUDENT_TEST("validatePath rejects a diagonal move") {
+    Grid<bool> maze = {{true, true},
+                       {true, true}};
+    Vector<GridLocation> path = {{0, 0}, {1, 1}};
+
+    EXPECT_ERROR(validatePath(maze, path));
+}
+
+STUDENT_TEST("validatePath rejects a repeated origin") {
+    Grid<bool> maze = {{true, true},
+                       {true, true}};
+    Vector<GridLocation> path = {
+        {0, 0}, {1, 0}, {0, 0}, {0, 1}, {1, 1}
+    };
+
+    EXPECT_ERROR(validatePath(maze, path));
+}
+
+STUDENT_TEST("solveMazeBFS on file 21x23") {
+    Grid<bool> maze;
+    readMazeFile("res/21x23.maze", maze);
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+STUDENT_TEST("solveMazeBFS on file 25x33") {
+    Grid<bool> maze;
+    readMazeFile("res/25x33.maze", maze);
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+STUDENT_TEST("solveMazeDFS on file 13x39") {
+    Grid<bool> maze;
+    readMazeFile("res/13x39.maze", maze);
+    Vector<GridLocation> soln = solveMazeDFS(maze);
+
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+STUDENT_TEST("solveMazeDFS on file 5x7") {
+    Grid<bool> maze;
+    readMazeFile("res/5x7.maze", maze);
+    Vector<GridLocation> soln = solveMazeDFS(maze);
+
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
