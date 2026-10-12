@@ -1,7 +1,10 @@
-// TODO: remove and replace this file header comment
-// This is a .cpp file you will edit and turn in.
-// Remove starter comments and add your own
-// comments on each function and on complex code sections.
+// Name: Montasir Mahir & Weijia Li
+// Course - CS 106B
+// Section - Thu 7:30 pm
+// Description - This file implements a simple search engine.
+// The program cleans words and builds an index of the web pages containing them.
+// Users can enter search terms to find matching pages.
+// A '+' before a term keeps pages containing that term, while a '-' removes them.
 #include <iostream>
 #include <fstream>
 #include "error.h"
@@ -16,8 +19,9 @@
 using namespace std;
 
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a string s and returns a cleaned version of it.
+// It changes all letters to lowercase and keeps only letters and digits.
+// If s is empty or contains only punctuation, it returns an empty string.
 string cleanToken(string s) {
     string temp;
     s = toLowerCase(s);
@@ -29,8 +33,9 @@ string cleanToken(string s) {
     return temp;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a string text and returns a set of its unique words.
+// It splits text at spaces and uses cleanToken to clean each word.
+// Empty words are skipped, and repeated words are only added once.
 Set<string> gatherTokens(string text) {
     Set<string> tokens;
     Vector<string> splitWords = stringSplit(text, ' ');
@@ -43,8 +48,11 @@ Set<string> gatherTokens(string text) {
     return tokens;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a file name dbfile and a map index passed by reference.
+// The file contains pairs of lines: a URL followed by the page's text.
+// It cleans the words from each page and adds the URL to each word's set
+// in index. It returns the number of web pages read.
+// If the file cannot be opened, it raises an error.
 int buildIndex(string dbfile, Map<string, Set<string>>& index) {
     /* The following code reads data from the file into a Vector
      * of strings representing the lines of the file.
@@ -68,18 +76,59 @@ int buildIndex(string dbfile, Map<string, Set<string>>& index) {
     return webPages;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a map index and a string query and returns a set
+// of matching URLs. It cleans each search term and looks it up in index.
+// Terms are processed from left to right. Regular terms add matching
+// pages, '+' terms keep shared pages, and '-' terms remove matching pages.
 Set<string> findQueryMatches(Map<string, Set<string>>& index, string query) {
     Set<string> result;
-    // TODO: your code here
+    Set<string> temp;
+    Vector<string> components = stringSplit(query,' ');
+
+    for (int i = 0; i < components.size(); i++) {
+        char prefix = components[i][0];
+        components[i] = cleanToken(components[i]);
+        temp = index[components[i]];
+        if (isalpha(prefix)) {
+            result += temp;
+        }
+        else if (prefix == '+') {
+            result.intersect(temp);
+        }
+        else if (prefix == '-') {
+            result.difference(temp);
+        }
+    }
     return result;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a file name dbfile and builds a search index from it.
+// It prints the number of pages and unique terms, then asks the user
+// to enter queries and prints the matching URLs.
+// It stops when the user enters an empty line and does not return a value.
 void searchEngine(string dbfile) {
-    // TODO: your code here
+    Map<string, Set<string>> index;
+    int pages = buildIndex(dbfile,index);
+    Vector<string> terms = index.keys();
+    int numOfTerms = terms.size();
+
+    cout << "Stand by while building index..." << endl;
+    cout << "Indexed " << pages << " pages containing " << numOfTerms << " unique terms." << endl;
+    cout << " " << endl;
+
+    string input = "";
+    while(true) {
+        input = getLine("Enter query sentence (RETURN/ENTER to quit): ");
+        if (input.empty()) {
+            break;
+        }
+        Set<string> results = findQueryMatches(index, input);
+        int numOfResults = results.size();
+        cout << "Found " << numOfResults << " matching pages" << endl;
+        cout << results << endl;
+        cout << " " << endl;
+    }
+
 }
 
 /* * * * * * Test Cases * * * * * */
@@ -145,9 +194,6 @@ PROVIDED_TEST("findQueryMatches from tiny.txt, compound queries") {
     Set<string> matchesRedWithoutFish = findQueryMatches(index, "red -fish");
     EXPECT_EQUAL(matchesRedWithoutFish.size(), 1);
 }
-
-
-// TODO: add your test cases here
 
 STUDENT_TEST("cleanToken on an empty string") {
     EXPECT_EQUAL(cleanToken(""), "");
@@ -221,4 +267,29 @@ STUDENT_TEST("buildIndex repeated words do not duplicate URLs") {
 STUDENT_TEST("buildIndex timing") {
     Map<string, Set<string>> index;
     TIME_OPERATION(4, buildIndex("res/website.txt", index));
+}
+
+STUDENT_TEST("findQueryMatches cleans case and punctuation") {
+    Map<string, Set<string>> index;
+    buildIndex("res/tiny.txt", index);
+
+    Set<string> expected = {"www.dr.seuss.net"};
+    EXPECT_EQUAL(findQueryMatches(index, "RED +Fish!"), expected);
+}
+
+STUDENT_TEST("findQueryMatches processes terms left to right") {
+    Map<string, Set<string>> index;
+    buildIndex("res/tiny.txt", index);
+
+    Set<string> expected = {"www.shoppinglist.com"};
+    EXPECT_EQUAL(findQueryMatches(index, "red fish +milk"), expected);
+}
+
+STUDENT_TEST("findQueryMatches handles missing terms") {
+    Map<string, Set<string>> index;
+    buildIndex("res/tiny.txt", index);
+
+    Set<string> expected = {"www.rainbow.org", "www.dr.seuss.net"};
+    EXPECT_EQUAL(findQueryMatches(index, "red -hippo"), expected);
+    EXPECT(findQueryMatches(index, "red +hippo").isEmpty());
 }

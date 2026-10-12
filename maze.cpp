@@ -1,7 +1,9 @@
-// TODO: remove and replace this file header comment
-// This is a .cpp file you will edit and turn in.
-// Remove starter comments and add your own
-// comments on each function and on complex code sections.
+// Name: Montasir Mahir & Weijia Li
+// Course - CS 106B
+// Section - Thu 7:30 pm
+// Description - This file finds and checks paths through a maze.
+// It uses breadth-first search with a queue and depth-first search with a stack.
+// Both searches display the paths they explore while looking for the exit.
 #include <iostream>
 #include <fstream>
 #include "error.h"
@@ -17,8 +19,10 @@
 using namespace std;
 
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a grid maze and a current location cur.
+// It checks the locations above, below, left, and right of cur.
+// It returns a set of neighboring locations that are inside the maze
+// and are open passages. Walls and diagonal moves are excluded.
 Set<GridLocation> generateValidMoves(Grid<bool>& maze, GridLocation cur) {
     Set<GridLocation> neighbors;
     Vector<GridLocation> candidates = {
@@ -37,8 +41,11 @@ Set<GridLocation> generateValidMoves(Grid<bool>& maze, GridLocation cur) {
     return neighbors;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a grid maze and a vector path, both passed by reference.
+// It checks that path is not empty, starts at the top-left corner,
+// and ends at the bottom-right corner. It also checks for repeated
+// locations and uses generateValidMoves to check each move.
+// It raises an error if a check fails and does not return a value.
 void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
     GridLocation exit = { maze.numRows()-1, maze.numCols()-1 }; // last row, last col
     GridLocation origin = {0,0};
@@ -71,8 +78,12 @@ void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
     }
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a grid maze and searches for a path from the
+// top-left corner to the bottom-right corner using breadth-first search.
+// A queue stores paths so shorter paths are explored first.
+// A set tracks locations already added to avoid visiting them again.
+// It displays the paths being explored and returns a shortest solution
+// if one exists. Otherwise, it returns the last path explored.
 Vector<GridLocation> solveMazeBFS(Grid<bool>& maze) {
     Vector<GridLocation> path = {{0, 0}};
     Queue<Vector<GridLocation>> allPaths;
@@ -101,8 +112,12 @@ Vector<GridLocation> solveMazeBFS(Grid<bool>& maze) {
     return path;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// This function takes a grid maze and searches for a path from the
+// top-left corner to the bottom-right corner using depth-first search.
+// A stack stores paths so the most recently added path is explored first.
+// A set tracks locations already added to avoid visiting them again.
+// It displays the paths being explored and returns a solution if one
+// exists. Otherwise, it returns the last path explored.
 Vector<GridLocation> solveMazeDFS(Grid<bool>& maze) {
     Vector<GridLocation> path = {{0, 0}};
     Stack<Vector<GridLocation>> allPaths;

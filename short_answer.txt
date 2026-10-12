@@ -1,6 +1,3 @@
-Before submitting this file, make sure that there are no more TODO
-placeholders remaining in the file (and remove this comment too).
-
 Warmup
 ------
 
@@ -83,10 +80,10 @@ A16. Here is what the resulting inverted index would be.
 Beyond Algorithmic Analysis
 ---------------------------
 Q17. In a short paragraph, describe a real or plausible scenario not previously presented in lecture in which using techniques like benchmarking or counting “write” steps to improve the performance of an algorithm might benefit Earth’s environment. Include your thoughts on how a software engineer working on this piece of code might identify such potential benefits and take them into consideration when designing the code.
-A17. TODO
+A17.  A photo backup app used by millions of people could save energy by only rewriting photos that have changed instead of rewriting every file. An engineer could count unnecessary writes and benchmark different versions to see which does less work. They could then consider energy use alongside speed and reliability when choosing a design. This reduces wasted electricity while still keeping everyone’s photos backed up correctly
 
 Q18. According to the contract that IBM struck with the state of Indiana, the criteria for optimization were improving efficiency of the overall welfare system and reducing fraud. Criteria for reducing wait times and wrongful denials were not included.  However, wrongfully denying benefits has a huge negative impact on the citizens who rely on the system.  If criteria like minimizing wrongful denials were not included in the contract, should engineers have included them in their optimization algorithm anyway?  Why or why not?
-A18. TODO
+A18. Yes, engineers should have tried to prevent wrongful denials even if the contract didn’t mention them. They should think about the people using the system, especially those who depend on these benefits for basic needs. Being efficient matters, but so does making sure eligible people actually get the help they need.
 
 Q19. Imagine that you took CS106B several years ago, and after completing CS106B, you were hired at Twitter as an engineer working on the image cropping system. How might you have approached setting the goals of this system? Is there a way you could design the procedures for code testing and release in your group to avoid the severe negative impacts on users of the system that are outlined in the case study?
-Q19. TODO
+Q19. I would set goals around keeping the important parts of an image visible and treating people fairly, alongside speed. Before release, I would test photos of people with different skin tones, lighting, and backgrounds and ask users for feedback. If the results showed bias, I would fix it before launching and let users choose or adjust their own crop.

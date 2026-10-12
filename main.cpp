@@ -14,9 +14,9 @@ int main() {
         return 0;
     }
 
-    Grid<bool> maze;
-    readMazeFile("res/21x23.maze", maze);
-    solveMazeBFS(maze);
+    // Grid<bool> maze;
+    // readMazeFile("res/21x23.maze", maze);
+    // solveMazeBFS(maze);
 
     searchEngine("res/website.txt");
 
